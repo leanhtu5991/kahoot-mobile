@@ -43,6 +43,7 @@ class RegisterForm extends React.Component {
         }
     }
     componentDidMount(){
+        console.log('register',this.props)
       }
     render(){
         return(

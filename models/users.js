@@ -33,5 +33,9 @@ userSchema.pre('save', function() {
     this.password = bcrypt.hashSync(this.password, saltRounds);
 });
 
+// userSchema.pre('update', function() {
+//     this.password = bcrypt.hashSync(this.password, saltRounds);
+// });
+
 module.exports =  mongoose.model('User',userSchema);
 

@@ -2,23 +2,26 @@ import React from 'react';
 import { StyleSheet, Text, View, Navigator, Button, TouchableOpacity } from 'react-native';
 
 import Login from './src/components/Login/Login'; 
-import LoginForm from './src/components/Login/LoginForm'; 
 import User from './src/components/User/User';
 import Authentication from './src/Services/Authentication';
 import AppNavigator from './src/AppNavigator';
+import {AsyncStorage} from 'react-native';
+import { API_URL_DEV } from 'react-native-dotenv'
+
 // import Routes from './src/Routes';
 export default class App extends React.Component {
   constructor(props){
     super(props);
-    authentication = new Authentication()
-  }
-  logout(){
-    console.log('logout');
-    authentication.logout()
-  }
+    this.state={
+        user : null,
+        token : ""
+    }
+}
+
   componentDidMount(){
-    authentication.getToken()
+    console.log(API_URL_DEV)
   }
+
   render() {
     return (
       <View style={styles.container}>

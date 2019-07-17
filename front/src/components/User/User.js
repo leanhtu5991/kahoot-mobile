@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {StyleSheet, View, Image, TextInput, Text, FlatList, ActivityIndicator} from 'react-native';
 import { ListItem, List, SearchBar} from 'react-native-elements';
 import { API_URL_DEV } from 'react-native-dotenv'
+
 // import DetailUser from './DetailUser';
 class User extends React.Component {
     constructor(props){
@@ -13,7 +14,7 @@ class User extends React.Component {
     }
     
     getAllUsers =()=>{
-        fetch(API_URL_DEV+'/api/users',{
+        fetch('http://192.168.0.17:3000/api/users',{
             method: "GET",
             headers: new Headers({
                 'Content-Type': 'application/json'
@@ -61,6 +62,7 @@ class User extends React.Component {
      }
     componentDidMount(){
         this.getAllUsers()
+        console.log(this.state.users)
     }
     render(){
         return(

@@ -1,22 +1,22 @@
 import React, {Component} from 'react';
 import {Alert, StyleSheet, View, Image, TextInput, Text, FlatList, ActivityIndicator, TouchableOpacity} from 'react-native';
 import { API_URL_DEV } from 'react-native-dotenv';
-import Dialog from "react-native-dialog";
+import Dialog from "react-native-dialog";;
 
-class DetailUser extends React.Component {
+class DetailQuizz extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            user :this.props.navigation.getParam('user'),
+            quizz :this.props.navigation.getParam('quizz'),
             message: "",
             showFormModify: false,
             dialogVisible: false
         }      
-        this.openModifyUser = this.openModifyUser.bind(this);
+        this.openModifyQuizz = this.openModifyQuizz.bind(this);
         this.cancel = this.cancel.bind(this);
-        this.modifyUser = this.modifyUser.bind(this)
+        this.modifyQuizz = this.modifyQuizz.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
     }
-
     showDialog = () => {
         this.setState({ dialogVisible: true });
     };
@@ -24,11 +24,9 @@ class DetailUser extends React.Component {
     handleCancel = () => {
         this.setState({ dialogVisible: false });
     };
-
     handleDelete = () => {
         this.setState({ dialogVisible: false });
-        console.log(this.state.user._id)
-        fetch('http://192.168.0.17:3000/api/deleteUser/'+this.state.user._id,{
+        fetch('http://192.168.0.17:3000/api/deleteQuizz/'+this.state.quizz._id,{
             method: "DELETE",
             headers: new Headers({
                 'Content-Type': 'application/json'
@@ -40,46 +38,34 @@ class DetailUser extends React.Component {
             this.setState({
                 message: res.message,
                 });
+                this.props.navigation.navigate('quizz', {
+                    user: this.state.user
+                })
             }
         )
-    };
-
+    }
     componentDidMount(){
-        console.log(this.state.user)
+        console.log(this.state.quizz)
     }
 
-    openModifyUser(){
+    openModifyQuizz(){
         this.setState({
             showFormModify: true,
             message : ""
         });
     }
+
     cancel(){
         this.setState({
             showFormModify: false
         });
     }
-    updateValue(text, field){
-        let obj = this.state.user;
-        if(field=='email'){
-            obj.email = text
-            this.setState( {user: obj})
-        } else if(field == 'isAdmin'){
-            obj.isAdmin = text
-            this.setState( {user: obj})
-        } else if(field == 'name'){
-            obj.name = text
-            this.setState({user: obj})
-        } else if(field == 'password'){
-            obj.password = text
-            this.setState({user: obj})
-        }
-    }
 
-    modifyUser(){
-        fetch('http://192.168.0.17:3000/api/updateUser',{
+    
+    modifyQuizz(){
+        fetch('http://192.168.0.17:3000/api/updateQuizz',{
             method: "POST",
-            body: JSON.stringify(this.state.user),
+            body: JSON.stringify(this.state.quizz),
             headers: new Headers({
                 'Content-Type': 'application/json'
             })
@@ -92,31 +78,53 @@ class DetailUser extends React.Component {
                     showFormModify: false
                 }
             )
+            this.props.navigation.navigate('quizz', {
+                user: this.state.user
+            })
         })
     }
     
-    render(){
-        let role;
-        if (this.state.user.isAdmin == true) {
-            role = "Admin"
-        } else {
-            role = "User"
+    updateValue(text, field){
+        let obj = this.state.quizz;
+        if(field=='question'){
+            obj.question = text
+            this.setState( {quizz: obj})
+        } else if(field == 'answer1'){
+            obj.answer.a1 = text
+            this.setState( {quizz: obj})
+        } else if(field == 'answer2'){
+            obj.answer.a2 = text
+            this.setState( {quizz: obj})
+        } else if(field == 'answer3'){
+            obj.answer.a3 = text
+            this.setState( {quizz: obj})
+        } else if(field == 'answer4'){
+            obj.answer.a4 = text
+            this.setState( {quizz: obj})
+        } else if(field == 'correct'){
+            obj.correct = text
+            this.setState( {quizz: obj})
         }
+    }
+
+    render(){
         return(
             <View style={styles.container}>
-                 <View style={styles.main}>
-                    <Text style={{fontSize: 20}}>{'Name: '+ this.state.user.name}</Text>
-                    <Text style={{fontSize: 20}}>{'Email: '+this.state.user.email}</Text>
-                    <Text style={{fontSize: 20}}>{'Role: '+role}</Text>
-                    <Text style={{fontSize: 20}}>{'Score: '+this.state.user.score}</Text>
+                <View style={styles.main}>
+                    <Text style={{fontSize: 20}}>{'Question: '+ this.state.quizz.question}</Text>
+                    <Text style={{fontSize: 20}}>{'Answer1: '+this.state.quizz.answer.a1}</Text>
+                    <Text style={{fontSize: 20}}>{'Answer2: '+this.state.quizz.answer.a2}</Text>
+                    <Text style={{fontSize: 20}}>{'Answer3: '+this.state.quizz.answer.a3}</Text>
+                    <Text style={{fontSize: 20}}>{'Answer4: '+this.state.quizz.answer.a4}</Text>
+                    <Text style={{fontSize: 20}}>{'Answer correct: '+this.state.quizz.correct}</Text>
                 </View>
                 {!this.state.showFormModify ?
                 <View style={styles.viewBtn}>
-                    <TouchableOpacity onPress={this.openModifyUser} style={styles.buttonModifyUser}>
-                        <Text style={styles.buttonModifyUserText}>Modifier</Text>
+                    <TouchableOpacity onPress={this.openModifyQuizz} style={styles.buttonModifyQuizz}>
+                        <Text style={styles.buttonModifyQuizzText}>Modifier</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={this.showDialog} style={styles.buttonDelUser}>
-                        <Text style={styles.buttonDelUserText}>Supprimer</Text>
+                    <TouchableOpacity onPress={this.handleDelete} style={styles.buttonDelQuizz}>
+                        <Text style={styles.buttonDelQuizzText}>Supprimer</Text>
                     </TouchableOpacity>
                 </View>
                 : null
@@ -124,33 +132,44 @@ class DetailUser extends React.Component {
                 {this.state.showFormModify ?
                 <View style={styles.formModify}>
                     <TextInput
-                        placeholder="Name"
+                        placeholder="Question"
                         style={styles.input}
-                        value = {this.state.user.name}
-                        onChangeText={(text)=>this.updateValue(text, 'name')}
+                        value = {this.state.quizz.question}
+                        onChangeText={(text)=>this.updateValue(text, 'question')}
                     />
                     <TextInput
-                        placeholder="Email"
+                        placeholder="Answer1"
                         style={styles.input}
-                        value = {this.state.user.email}
-                        onChangeText={(text)=>this.updateValue(text, 'email')}
+                        value = {this.state.quizz.answer.a1}
+                        onChangeText={(text)=>this.updateValue(text, 'answer1')}
                     />
                     <TextInput
-                        placeholder="Role"
+                        placeholder="Answer2"
                         style={styles.input}
-                        value = {role}
-                        onChangeText={(text)=>this.updateValue(text, 'role')}
+                        value = {this.state.quizz.answer.a2}
+                        onChangeText={(text)=>this.updateValue(text, 'answer2')}
                     />
                     <TextInput
-                        placeholder="Password"
-                        secureTextEntry
+                        placeholder="Answer3"
                         style={styles.input}
-                        value = {this.state.user.password}
-                        onChangeText={(text)=>this.updateValue(text, 'password')}
+                        value = {this.state.quizz.answer.a3}
+                        onChangeText={(text)=>this.updateValue(text, 'answer3')}
+                    />
+                    <TextInput
+                        placeholder="Answer4"
+                        style={styles.input}
+                        value = {this.state.quizz.answer.a4}
+                        onChangeText={(text)=>this.updateValue(text, 'answer4')}
+                    />
+                    <TextInput
+                        placeholder="Answer correct"
+                        style={styles.input}
+                        value = {this.state.quizz.correct}
+                        onChangeText={(text)=>this.updateValue(text, 'correct')}
                     />
                     <View style={styles.viewBtn}>
-                        <TouchableOpacity onPress={this.modifyUser} style={styles.buttonModifyUser}>
-                            <Text style={styles.buttonModifyUserText}>Modifier</Text>
+                        <TouchableOpacity onPress={this.modifyQuizz} style={styles.buttonModifyQuizz}>
+                            <Text style={styles.buttonModifyQuizzText}>Modifier</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={this.cancel} style={styles.buttonCancel}>
                             <Text style={styles.buttonCancelText}>Annuler</Text>
@@ -163,7 +182,7 @@ class DetailUser extends React.Component {
                     <Dialog.Container visible={this.state.dialogVisible}>
                     <Dialog.Title>Account delete</Dialog.Title>
                     <Dialog.Description>
-                        Do you want to delete this account? You cannot undo this action.
+                        Do you want to delete this quizz? You cannot undo this action.
                     </Dialog.Description>
                         <Dialog.Button label="Cancel" onPress={this.handleCancel} />
                         <Dialog.Button label="Delete" onPress={this.handleDelete} />
@@ -193,7 +212,7 @@ const styles = StyleSheet.create({
         marginLeft:20,
         // display: 'none'
     },
-    buttonDelUser:{
+    buttonDelQuizz:{
         backgroundColor: 'red',
         paddingVertical: 10,
         width : 100,
@@ -203,7 +222,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         width : 100
     },
-    buttonDelUserText:{
+    buttonDelQuizzText:{
         textAlign: 'center',
         color: 'black',
         fontWeight: '700'
@@ -213,12 +232,12 @@ const styles = StyleSheet.create({
         color: 'black',
         fontWeight: '700'
     },
-    buttonModifyUser:{
+    buttonModifyQuizz:{
         backgroundColor: '#2980b9',
         paddingVertical: 10,
         width : 100
     },
-    buttonModifyUserText:{
+    buttonModifyQuizzText:{
         textAlign: 'center',
         color: '#FFF',
         fontWeight: '700'
@@ -231,4 +250,4 @@ const styles = StyleSheet.create({
         paddingHorizontal:10
     },
 })
-export default DetailUser
+export default DetailQuizz
